@@ -190,7 +190,7 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
         self.applicationVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         if ([self.applicationVersion length] == 0)
         {
-            self.applicationVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
+            self.applicationVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
         }
         
         //bundle id
@@ -578,22 +578,22 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
         if (self.lastReminded != nil)
         {
             //reminder takes priority over check period
-            if ([[NSDate date] timeIntervalSinceDate:self.lastReminded] < self.remindPeriod * SECONDS_IN_A_DAY)
+            if ([[NSDate date] timeIntervalSinceDate:self.lastReminded] < (double)self.remindPeriod * SECONDS_IN_A_DAY)
             {
                 if (self.verboseLogging)
                 {
-                    NSLog(@"iVersion did not check for a new version because the user last asked to be reminded less than %g days ago", self.remindPeriod);
+                    NSLog(@"iVersion did not check for a new version because the user last asked to be reminded less than %g days ago", (double)self.remindPeriod);
                 }
                 return NO;
             }
         }
         
         //check if within the check period
-        else if (self.lastChecked != nil && [[NSDate date] timeIntervalSinceDate:self.lastChecked] < self.checkPeriod * SECONDS_IN_A_DAY)
+        else if (self.lastChecked != nil && [[NSDate date] timeIntervalSinceDate:self.lastChecked] < (double)self.checkPeriod * SECONDS_IN_A_DAY)
         {
             if (self.verboseLogging)
             {
-                NSLog(@"iVersion did not check for a new version because the last check was less than %g days ago", self.checkPeriod);
+                NSLog(@"iVersion did not check for a new version because the last check was less than %g days ago", (double)self.checkPeriod);
             }
             return NO;
         }
@@ -733,7 +733,7 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
             
             NSError *error = nil;
             NSURLResponse *response = nil;
-            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:iTunesServiceURL]
+            NSURLRequest *request = [NSURLRequest requestWithURL:(NSURL *)[NSURL URLWithString:iTunesServiceURL]
                                                      cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                                                  timeoutInterval:REQUEST_TIMEOUT];
             NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -874,7 +874,7 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
                             NSLog(@"iVersion will check %@ for %@", self.remoteVersionsPlistURL, self.appStoreID? @"release notes": @"a new app version");
                         }
                         
-                        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.remoteVersionsPlistURL] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:REQUEST_TIMEOUT];
+                        NSURLRequest *request = [NSURLRequest requestWithURL:(NSURL *)[NSURL URLWithString:self.remoteVersionsPlistURL] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:REQUEST_TIMEOUT];
                         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
                         if (data)
                         {
@@ -1268,19 +1268,19 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
         UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) &&
         [[UIDevice currentDevice].systemVersion floatValue] < 7.0f)
     {
-        CGFloat max = alertView.window.bounds.size.height - alertView.frame.size.height - 10.0f;
-        CGFloat offset = 0.0f;
+        CGFloat max = alertView.window.bounds.size.height - alertView.frame.size.height - (CGFloat)10.0f;
+        CGFloat offset = (CGFloat)0.0f;
         for (UIView *view in alertView.subviews)
         {
             CGRect frame = view.frame;
             if ([view isKindOfClass:[UILabel class]])
             {
                 UILabel *label = (UILabel *)view;
-                if ([label.text isEqualToString:alertView.message])
+                if ([label.text isEqualToString:(NSString *)alertView.message])
                 {
                     label.lineBreakMode = NSLineBreakByWordWrapping;
                     label.numberOfLines = 0;
-                    label.alpha = 1.0f;
+                    label.alpha = (CGFloat)1.0f;
                     [label sizeToFit];
                     offset = label.frame.size.height - frame.size.height;
                     frame.size.height = label.frame.size.height;
@@ -1289,16 +1289,16 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
                         frame.size.height -= (offset - max);
                         offset = max;
                     }
-                    if (offset > max - 10.0f)
+                    if (offset > max - (CGFloat)10.0f)
                     {
                         frame.size.height -= (offset - max - 10);
-                        frame.origin.y += (offset - max - 10) / 2.0f;
+                        frame.origin.y += (offset - max - 10) / (CGFloat)2.0f;
                     }
                 }
             }
             else if ([view isKindOfClass:[UITextView class]])
             {
-                view.alpha = 0.0f;
+                view.alpha = (CGFloat)0.0f;
             }
             else if ([view isKindOfClass:[UIControl class]])
             {
@@ -1307,7 +1307,7 @@ static NSString *const iVersionMacAppStoreURLFormat = @"macappstore://itunes.app
             view.frame = frame;
         }
         CGRect frame = alertView.frame;
-        frame.origin.y -= roundf(offset/2.0f);
+        frame.origin.y -= (CGFloat)roundf(offset/(CGFloat)2.0f);
         frame.size.height += offset;
         alertView.frame = frame;
     }
